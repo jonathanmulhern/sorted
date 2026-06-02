@@ -1,4 +1,3 @@
-```javascript
 const sortButton = document.getElementById("sortButton");
 
 sortButton.addEventListener("click", sortTasks);
@@ -115,4 +114,3 @@ window.addEventListener("load", () => {
         sortTasks();
     }
 });
-```
