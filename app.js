@@ -1,6 +1,6 @@
 const sortButton = document.getElementById("sortButton");
 
-const STORAGE_KEY = "sorted-v6";
+const STORAGE_KEY = "sorted-v7";
 const LEARNING_KEY = "sorted-learning";
 
 sortButton.addEventListener("click", sortTasks);
@@ -39,11 +39,12 @@ function sortTasks() {
     saveData();
     updateCounts();
 
-    alert(
+    showStatus(
+        "✓ " +
         tasks.length +
-        " tasks sorted.\n" +
+        " tasks sorted • 🤔 " +
         reviewCount +
-        " need review."
+        " need review"
     );
 }
 
@@ -107,6 +108,10 @@ function createTask(text, column) {
 
                 saveData();
                 updateCounts();
+
+                showStatus(
+                    "✅ Task completed"
+                );
             }
 
         });
@@ -133,8 +138,8 @@ function moveTask(button, destination) {
 
         if (count >= 3) {
 
-            alert(
-                "Today's list is limited to 3 tasks."
+            showStatus(
+                "⚠ Today is limited to 3 tasks"
             );
 
             return;
@@ -149,15 +154,33 @@ function moveTask(button, destination) {
 
     saveData();
     updateCounts();
+
+    showStatus(
+        "Moved to " +
+        destination
+    );
 }
 
 function learnTask(taskText, category) {
+
+    const ignoredWords = [
+        "ring",
+        "call",
+        "speak",
+        "the",
+        "and",
+        "for",
+        "with",
+        "about",
+        "to"
+    ];
 
     const words =
         taskText
         .split(" ")
         .filter(word =>
-            word.length > 2
+            word.length > 2 &&
+            !ignoredWords.includes(word)
         );
 
     words.forEach(word => {
@@ -261,27 +284,60 @@ function loadData() {
     updateCounts();
 }
 
+function showStatus(message){
+
+    const bar =
+        document.getElementById(
+            "statusBar"
+        );
+
+    if(!bar) return;
+
+    bar.textContent = message;
+    bar.style.display = "block";
+
+    setTimeout(() => {
+
+        bar.style.display = "none";
+
+    }, 4000);
+}
+
 function setGreeting() {
-
-    const hour =
-        new Date().getHours();
-
-    let greeting =
-        "Welcome back, Captain.";
-
-    if (hour >= 12)
-        greeting =
-        "Welcome back, Captain.";
-
-    if (hour >= 18)
-        greeting =
-        "Good evening, Captain.";
 
     document
         .getElementById("greeting")
         .textContent =
-        greeting;
+        "Welcome back, Captain.";
 }
 
 setGreeting();
 loadData();
+
+const clearDoneBtn =
+    document.getElementById(
+        "clearDoneBtn"
+    );
+
+if(clearDoneBtn){
+
+    clearDoneBtn
+    .addEventListener(
+        "click",
+        () => {
+
+            document
+            .getElementById(
+                "done"
+            )
+            .innerHTML = "";
+
+            saveData();
+            updateCounts();
+
+            showStatus(
+                "✅ Done tasks cleared"
+            );
+        }
+    );
+}
