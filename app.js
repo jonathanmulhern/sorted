@@ -1,8 +1,8 @@
 const sortButton = document.getElementById("sortButton");
 
-sortButton.addEventListener("click", sortTasks);
-
 const STORAGE_KEY = "sorted-v5";
+
+sortButton.addEventListener("click", sortTasks);
 
 function sortTasks() {
 
@@ -15,11 +15,7 @@ const tasks = text
     .filter(t => t.length > 0);
 
 tasks.forEach(task => {
-
-    const category = classify(task);
-
-    createTask(task, category);
-
+    createTask(task, classify(task));
 });
 
 document.getElementById("brainDump").value = "";
@@ -64,26 +60,23 @@ task.innerHTML = `
         <input type="checkbox">
         ${text}
     </label>
-
     <div class="task-controls">
         <button onclick="moveTask(this,'today')">⭐</button>
     </div>
 `;
 
-task.querySelector("input")
-    .addEventListener("change", function () {
+task.querySelector("input").addEventListener("change", function () {
 
-        if (this.checked) {
+    if (this.checked) {
 
-            document
-                .getElementById("done")
-                .appendChild(task);
+        document
+            .getElementById("done")
+            .appendChild(task);
 
-            saveData();
-            updateCounts();
-        }
-
-    });
+        saveData();
+        updateCounts();
+    }
+});
 
 document
     .getElementById(column)
@@ -100,15 +93,10 @@ const task = button.closest(".task");
 if (destination === "today") {
 
     const count =
-        document.getElementById("today")
-            .children.length;
+        document.getElementById("today").children.length;
 
     if (count >= 3) {
-
-        alert(
-            "Today's list is limited to 3 tasks."
-        );
-
+        alert("Today's list is limited to 3 tasks.");
         return;
     }
 }
@@ -139,14 +127,11 @@ const sections = [
 sections.forEach(section => {
 
     const count =
-        document
-            .getElementById(section)
-            .children.length;
+        document.getElementById(section).children.length;
 
     document.getElementById(
         section + "Count"
     ).textContent = count;
-
 });
 ```
 
@@ -167,17 +152,9 @@ const data = {};
     "done"
 ].forEach(section => {
 
-    data[section] =
-        Array.from(
-            document
-                .getElementById(section)
-                .children
-        ).map(task =>
-            task.innerText
-                .replace("⭐", "")
-                .trim()
-        );
-
+    data[section] = Array.from(
+        document.getElementById(section).children
+    ).map(task => task.innerText.replace("⭐", "").trim());
 });
 
 localStorage.setItem(
@@ -196,23 +173,16 @@ const saved =
 
 if (!saved) return;
 
-const data =
-    JSON.parse(saved);
+const data = JSON.parse(saved);
 
-Object.keys(data)
-    .forEach(section => {
+Object.keys(data).forEach(section => {
 
-        data[section]
-            .forEach(task => {
+    data[section].forEach(task => {
 
-                createTask(
-                    task,
-                    section
-                );
-
-            });
+        createTask(task, section);
 
     });
+});
 
 updateCounts();
 ```
@@ -222,23 +192,17 @@ updateCounts();
 function setGreeting() {
 
 ```
-const hour =
-    new Date().getHours();
+const hour = new Date().getHours();
 
-let greeting =
-    "Good morning, Captain.";
+let greeting = "Good morning, Captain.";
 
 if (hour >= 12)
-    greeting =
-        "Good afternoon, Captain.";
+    greeting = "Good afternoon, Captain.";
 
 if (hour >= 18)
-    greeting =
-        "Good evening, Captain.";
+    greeting = "Good evening, Captain.";
 
-document.getElementById(
-    "greeting"
-).textContent = greeting;
+document.getElementById("greeting").textContent = greeting;
 ```
 
 }
