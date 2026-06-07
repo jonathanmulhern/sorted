@@ -1,184 +1,210 @@
+```javascript
 const sortButton = document.getElementById("sortButton");
 
 sortButton.addEventListener("click", sortTasks);
 
-function sortTasks() {
+const STORAGE_KEY = "sorted-v5";
 
-```
-clearColumns();
+function sortTasks(){
 
 const text =
-    document.getElementById("brainDump").value;
+document.getElementById("brainDump").value;
 
 const tasks =
-    text.split("\n")
-        .map(t => t.trim())
-        .filter(t => t.length > 0);
+text.split("\n")
+.map(t => t.trim())
+.filter(t => t.length > 0);
 
 tasks.forEach(task => {
 
-    const category = classifyTask(task);
+const category = classify(task);
 
-    addTask(task, category);
+createTask(task, category);
 
 });
 
-localStorage.setItem(
-    "sortedBrainDump",
-    text
-);
+document.getElementById("brainDump").value = "";
+
+saveData();
 
 updateCounts();
-```
-
 }
 
-function classifyTask(task) {
+function classify(task){
 
-```
-const lower = task.toLowerCase();
+const t = task.toLowerCase();
 
-const schoolWords = [
-    "mark","books","book","report","lesson",
-    "school","meeting","parent","sats",
-    "planning","maths","english","pupil"
-];
+if(/mark|book|report|lesson|school|meeting|parent|maths/.test(t))
+return "school";
 
-const healthWords = [
-    "doctor","gp","physio","dentist",
-    "exercise","walk","neck","health",
-    "appointment","prescription"
-];
+if(/doctor|gp|physio|exercise|walk|dentist|neck/.test(t))
+return "health";
 
-const moneyWords = [
-    "mortgage","bank","bill","savings",
-    "insurance","budget","tax","finance"
-];
+if(/mortgage|bank|bill|savings|insurance|budget/.test(t))
+return "money";
 
-const homeWords = [
-    "clean","floor","kitchen","garden",
-    "shopping","shop","family","washing",
-    "vacuum","bins","home","diy"
-];
+if(/clean|floor|shop|shopping|family|garden|diy/.test(t))
+return "home";
 
-if (schoolWords.some(word => lower.includes(word))) {
-    return "school";
+return "review";
 }
 
-if (healthWords.some(word => lower.includes(word))) {
-    return "health";
-}
+function createTask(text, column){
 
-if (moneyWords.some(word => lower.includes(word))) {
-    return "money";
-}
-
-if (homeWords.some(word => lower.includes(word))) {
-    return "home";
-}
-
-return "ideas";
-```
-
-}
-
-function addTask(text, columnId) {
-
-```
 const task = document.createElement("div");
 
 task.className = "task";
 
 task.innerHTML = `
-    ${text}
-    <div style="margin-top:6px;">
-        <button onclick="moveTask(this,'top3')">⭐</button>
-        <button onclick="moveTask(this,'notToday')">⏸</button>
-        <button onclick="moveTask(this,'done')">✓</button>
-    </div>
+<label>
+<input type="checkbox">
+${text}
+</label>
+
+<div class="task-controls">
+<button onclick="moveTask(this,'today')">⭐</button>
+</div>
 `;
 
-document
-    .getElementById(columnId)
-    .appendChild(task);
-```
+task.querySelector("input")
+.addEventListener("change", function(){
 
-}
+if(this.checked){
+document.getElementById("done")
+.appendChild(task);
 
-function moveTask(button, destination) {
-
-```
-const task =
-    button.closest(".task");
-
-document
-    .getElementById(destination)
-    .appendChild(task);
-
+saveData();
 updateCounts();
-```
-
 }
 
-function clearColumns() {
-
-```
-[
-    "school",
-    "home",
-    "health",
-    "money",
-    "ideas"
-].forEach(id => {
-    document.getElementById(id).innerHTML = "";
 });
-```
 
+document
+.getElementById(column)
+.appendChild(task);
 }
 
-function updateCounts() {
+function moveTask(button,destination){
 
-```
+const task = button.closest(".task");
+
+if(destination==="today"){
+
+const count =
+document.getElementById("today")
+.children.length;
+
+if(count>=3){
+alert("Today's list is limited to 3 tasks.");
+return;
+}
+}
+
+document
+.getElementById(destination)
+.appendChild(task);
+
+saveData();
+updateCounts();
+}
+
+function updateCounts(){
+
 const sections = [
-    "school",
-    "home",
-    "health",
-    "money",
-    "ideas",
-    "top3",
-    "notToday",
-    "done"
+"today",
+"school",
+"home",
+"health",
+"money",
+"review",
+"done"
 ];
 
-sections.forEach(id => {
+sections.forEach(section => {
 
-    const count =
-        document
-        .getElementById(id)
-        .children.length;
+const count =
+document.getElementById(section)
+.children.length;
 
-    console.log(id + ": " + count);
+document.getElementById(
+section + "Count"
+).textContent = count;
+
 });
-```
-
 }
 
-window.addEventListener("load", () => {
+function saveData(){
 
-```
+const data = {};
+
+[
+"today",
+"school",
+"home",
+"health",
+"money",
+"review",
+"done"
+].forEach(section => {
+
+data[section] =
+Array.from(
+document.getElementById(section).children
+).map(task =>
+task.innerText.replace("⭐","").trim()
+);
+
+});
+
+localStorage.setItem(
+STORAGE_KEY,
+JSON.stringify(data)
+);
+}
+
+function loadData(){
+
 const saved =
-    localStorage.getItem(
-        "sortedBrainDump"
-    );
+localStorage.getItem(STORAGE_KEY);
 
-if (saved) {
+if(!saved) return;
 
-    document
-        .getElementById("brainDump")
-        .value = saved;
+const data =
+JSON.parse(saved);
 
-    sortTasks();
-}
-```
+Object.keys(data).forEach(section => {
+
+data[section].forEach(task => {
+
+createTask(task, section);
 
 });
+
+});
+
+updateCounts();
+}
+
+function setGreeting(){
+
+const hour = new Date().getHours();
+
+let greeting =
+"Good morning, Captain.";
+
+if(hour >= 12)
+greeting =
+"Good afternoon, Captain.";
+
+if(hour >= 18)
+greeting =
+"Good evening, Captain.";
+
+document.getElementById(
+"greeting"
+).textContent = greeting;
+}
+
+setGreeting();
+loadData();
+```
