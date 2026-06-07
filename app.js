@@ -6,205 +6,181 @@ sortButton.addEventListener("click", sortTasks);
 
 function sortTasks() {
 
-```
-const text = document.getElementById("brainDump").value;
+    const text = document.getElementById("brainDump").value;
 
-const tasks = text
-    .split("\n")
-    .map(t => t.trim())
-    .filter(t => t.length > 0);
+    const tasks = text
+        .split("\n")
+        .map(t => t.trim())
+        .filter(t => t.length > 0);
 
-tasks.forEach(task => {
-    createTask(task, classify(task));
-});
+    tasks.forEach(task => {
+        createTask(task, classify(task));
+    });
 
-document.getElementById("brainDump").value = "";
+    document.getElementById("brainDump").value = "";
 
-saveData();
-updateCounts();
-```
-
+    saveData();
+    updateCounts();
 }
 
 function classify(task) {
 
-```
-const t = task.toLowerCase();
+    const t = task.toLowerCase();
 
-if (/mark|book|report|lesson|school|meeting|parent|maths/.test(t))
-    return "school";
+    if (/mark|book|report|lesson|school|meeting|parent|maths/.test(t))
+        return "school";
 
-if (/doctor|gp|physio|exercise|walk|dentist|neck/.test(t))
-    return "health";
+    if (/doctor|gp|physio|exercise|walk|dentist|neck/.test(t))
+        return "health";
 
-if (/mortgage|bank|bill|savings|insurance|budget/.test(t))
-    return "money";
+    if (/mortgage|bank|bill|savings|insurance|budget/.test(t))
+        return "money";
 
-if (/clean|floor|shop|shopping|family|garden|diy/.test(t))
-    return "home";
+    if (/clean|floor|shop|shopping|family|garden|diy/.test(t))
+        return "home";
 
-return "review";
-```
-
+    return "review";
 }
 
 function createTask(text, column) {
 
-```
-const task = document.createElement("div");
+    const task = document.createElement("div");
 
-task.className = "task";
+    task.className = "task";
 
-task.innerHTML = `
-    <label>
-        <input type="checkbox">
-        ${text}
-    </label>
-    <div class="task-controls">
-        <button onclick="moveTask(this,'today')">⭐</button>
-    </div>
-`;
+    task.innerHTML = `
+        <label>
+            <input type="checkbox">
+            ${text}
+        </label>
+        <div class="task-controls">
+            <button onclick="moveTask(this,'today')">⭐</button>
+        </div>
+    `;
 
-task.querySelector("input").addEventListener("change", function () {
+    task.querySelector("input").addEventListener("change", function () {
 
-    if (this.checked) {
+        if (this.checked) {
 
-        document
-            .getElementById("done")
-            .appendChild(task);
+            document
+                .getElementById("done")
+                .appendChild(task);
 
-        saveData();
-        updateCounts();
-    }
-});
+            saveData();
+            updateCounts();
+        }
+    });
 
-document
-    .getElementById(column)
-    .appendChild(task);
-```
-
+    document
+        .getElementById(column)
+        .appendChild(task);
 }
 
 function moveTask(button, destination) {
 
-```
-const task = button.closest(".task");
+    const task = button.closest(".task");
 
-if (destination === "today") {
+    if (destination === "today") {
 
-    const count =
-        document.getElementById("today").children.length;
+        const count =
+            document.getElementById("today").children.length;
 
-    if (count >= 3) {
-        alert("Today's list is limited to 3 tasks.");
-        return;
+        if (count >= 3) {
+            alert("Today's list is limited to 3 tasks.");
+            return;
+        }
     }
-}
 
-document
-    .getElementById(destination)
-    .appendChild(task);
+    document
+        .getElementById(destination)
+        .appendChild(task);
 
-saveData();
-updateCounts();
-```
-
+    saveData();
+    updateCounts();
 }
 
 function updateCounts() {
 
-```
-const sections = [
-    "today",
-    "school",
-    "home",
-    "health",
-    "money",
-    "review",
-    "done"
-];
+    const sections = [
+        "today",
+        "school",
+        "home",
+        "health",
+        "money",
+        "review",
+        "done"
+    ];
 
-sections.forEach(section => {
+    sections.forEach(section => {
 
-    const count =
-        document.getElementById(section).children.length;
+        const count =
+            document.getElementById(section).children.length;
 
-    document.getElementById(
-        section + "Count"
-    ).textContent = count;
-});
-```
-
+        document.getElementById(
+            section + "Count"
+        ).textContent = count;
+    });
 }
 
 function saveData() {
 
-```
-const data = {};
+    const data = {};
 
-[
-    "today",
-    "school",
-    "home",
-    "health",
-    "money",
-    "review",
-    "done"
-].forEach(section => {
+    [
+        "today",
+        "school",
+        "home",
+        "health",
+        "money",
+        "review",
+        "done"
+    ].forEach(section => {
 
-    data[section] = Array.from(
-        document.getElementById(section).children
-    ).map(task => task.innerText.replace("⭐", "").trim());
-});
+        data[section] = Array.from(
+            document.getElementById(section).children
+        ).map(task => task.innerText.replace("⭐", "").trim());
+    });
 
-localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(data)
-);
-```
-
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(data)
+    );
 }
 
 function loadData() {
 
-```
-const saved =
-    localStorage.getItem(STORAGE_KEY);
+    const saved =
+        localStorage.getItem(STORAGE_KEY);
 
-if (!saved) return;
+    if (!saved) return;
 
-const data = JSON.parse(saved);
+    const data = JSON.parse(saved);
 
-Object.keys(data).forEach(section => {
+    Object.keys(data).forEach(section => {
 
-    data[section].forEach(task => {
+        data[section].forEach(task => {
 
-        createTask(task, section);
+            createTask(task, section);
 
+        });
     });
-});
 
-updateCounts();
-```
-
+    updateCounts();
 }
 
 function setGreeting() {
 
-```
-const hour = new Date().getHours();
+    const hour = new Date().getHours();
 
-let greeting = "Good morning, Captain.";
+    let greeting = "Good morning, Captain.";
 
-if (hour >= 12)
-    greeting = "Good afternoon, Captain.";
+    if (hour >= 12)
+        greeting = "Good afternoon, Captain.";
 
-if (hour >= 18)
-    greeting = "Good evening, Captain.";
+    if (hour >= 18)
+        greeting = "Good evening, Captain.";
 
-document.getElementById("greeting").textContent = greeting;
-```
-
+    document.getElementById("greeting").textContent = greeting;
 }
 
 setGreeting();
