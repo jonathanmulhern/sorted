@@ -267,11 +267,11 @@ function setGreeting() {
         new Date().getHours();
 
     let greeting =
-        "Good morning, Captain.";
+        "Welcome back, Captain.";
 
     if (hour >= 12)
         greeting =
-        "Good afternoon, Captain.";
+        "Welcome back, Captain.";
 
     if (hour >= 18)
         greeting =
